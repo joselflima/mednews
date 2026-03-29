@@ -1,4 +1,5 @@
 feedparser
 pytest
+pandas
 groq
 python-dotenv
