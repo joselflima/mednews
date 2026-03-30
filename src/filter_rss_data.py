@@ -5,7 +5,7 @@ from __future__ import annotations
 import feedparser
 import pandas as pd
 
-REQUIRED_COLUMNS = ["title", "description", "link", "pubDate"]
+REQUIRED_COLUMNS = ["title", "summary", "link", "published"]
 
 
 def filter_rss_data(feed: feedparser.FeedParserDict) -> pd.DataFrame:
@@ -17,19 +17,20 @@ def filter_rss_data(feed: feedparser.FeedParserDict) -> pd.DataFrame:
 
     _check_feed_types(feed)
 
-    raw_df = pd.DataFrame(feed.get("entries"))
-
-    if "pubDate" not in raw_df.columns and "published" in raw_df.columns:
-        raw_df["pubDate"] = raw_df["published"]
+    entries = feed.get("entries") if isinstance(feed, feedparser.FeedParserDict) else feed
+    raw_df = pd.DataFrame(entries)
 
     df = _check_required_columns(raw_df)
 
     return df.dropna(subset=REQUIRED_COLUMNS).reset_index(drop=True)
 
 
-def _check_feed_types(feed: feedparser.FeedParserDict) -> None:
+def _check_feed_types(feed: feedparser.FeedParserDict | list) -> None:
+    if isinstance(feed, list):
+        return
+
     if not isinstance(feed, feedparser.FeedParserDict):
-        raise ValueError("Invalid feed data: expected FeedParserDict")
+        raise ValueError("Invalid feed data: expected FeedParserDict or list")
 
     entries = feed.get("entries")
     if not isinstance(entries, list):
