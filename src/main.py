@@ -3,6 +3,7 @@ import json
 
 from rss_fetcher import fetch_rss_feed
 from filter_rss_data import filter_rss_data
+from translator import translate_feed
 
 
 def main():
@@ -10,6 +11,8 @@ def main():
 
     feed = fetch_rss_feed(URL)
     df = filter_rss_data(feed)
+    df = translate_feed(df)
+    
     print(df.head(5))
 
 
