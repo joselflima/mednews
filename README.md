@@ -1,5 +1,9 @@
 # 🏥 MedNews - Seu Resumo Diário de Medicina
 
+<p align="center">
+  <img src="assets/email_mockup.png" alt="MedNews Email Mockup" width="600">
+</p>
+
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TDD Methodology](https://img.shields.io/badge/Methodology-TDD-green.svg)](#metodologia-de-desenvolvimento)
