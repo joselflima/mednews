@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 import groq
 import pandas as pd
@@ -90,11 +91,15 @@ def translate_feed(df: pd.DataFrame) -> pd.DataFrame:
 
     translated_df = validate_input(df)
 
-    for index, row in translated_df.iterrows():
+    rows = list(translated_df.iterrows())
+    for i, (index, row) in enumerate(rows):
         response_text = call_groq_api(row["title"], row["summary"])
         translated = parse_llm_response(response_text)
 
         translated_df.at[index, "title"] = translated["title"]
         translated_df.at[index, "summary"] = translated["summary"]
+
+        if i < len(rows) - 1:
+            time.sleep(1)
 
     return translated_df

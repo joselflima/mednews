@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 import pandas as pd
 import pytest
@@ -114,3 +115,50 @@ def test_translate_feed_returns_dataframe_with_translated_columns(
     assert len(result) == 1
     assert result.loc[0, "title"] == "Titulo traduzido"
     assert result.loc[0, "summary"] == "Resumo traduzido"
+
+
+def test_translate_feed_waits_one_second_between_rows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Calls time.sleep(1) between each row to avoid Groq API rate limits."""
+
+    sleep_calls: list[float] = []
+
+    def mock_sleep(seconds: float) -> None:
+        sleep_calls.append(seconds)
+
+    def mock_call_groq_api(_: str, __: str) -> str:
+        return json.dumps({"title": "Titulo", "summary": "Resumo"})
+
+    import src.translator as translator_module
+
+    monkeypatch.setattr(translator_module.time, "sleep", mock_sleep)
+    monkeypatch.setattr("src.translator.call_groq_api", mock_call_groq_api)
+
+    multi_row_df = pd.DataFrame(
+        [
+            {
+                "title": "Title 1",
+                "summary": "Summary 1",
+                "link": "https://example.com/1",
+                "published": "Fri, 28 Mar 2026 10:00:00 GMT",
+            },
+            {
+                "title": "Title 2",
+                "summary": "Summary 2",
+                "link": "https://example.com/2",
+                "published": "Fri, 28 Mar 2026 11:00:00 GMT",
+            },
+            {
+                "title": "Title 3",
+                "summary": "Summary 3",
+                "link": "https://example.com/3",
+                "published": "Fri, 28 Mar 2026 12:00:00 GMT",
+            },
+        ]
+    )
+
+    translate_feed(multi_row_df)
+
+    # sleep should be called once BETWEEN rows: n_rows - 1 times
+    assert sleep_calls == [1, 1]
