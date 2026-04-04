@@ -1,5 +1,6 @@
 name: Schedule MedNews
 on:
+  workflow_dispatch:
   schedule:
     # Runs at 10:00 UTC (7:00 BRT) every day
     - cron: '0 10 * * *'
